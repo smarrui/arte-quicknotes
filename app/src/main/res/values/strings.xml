@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Quick Notes</string>
-    <string name="title_activity_basic">BasicActivity</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="hola_mundo">Hola mundo</string>
+    <string name="title_activity_note">The quick note</string>
+    <string name="title_activity_main">Quick Notes</string>
+    <string name="hello_world">Hello world</string>
+    <string name="note.title">Title</string>
+    <string name="content">Content</string>
+    <string name="menu.save">Add</string>
+    <string name="menu.delete">Delete</string>
 </resources>

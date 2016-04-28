@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notas rápidas</string>
+    <string name="title_activity_note">La nota rápida</string>
+    <string name="title_activity_main">Notas rápidas</string>
+    <string name="hello_world">Hola mundo</string>
+    <string name="note.title">Título</string>
+    <string name="content">Contenido</string>
+    <string name="menu.save">Guardar</string>
+    <string name="menu.delete">Borrar</string>
+</resources>
