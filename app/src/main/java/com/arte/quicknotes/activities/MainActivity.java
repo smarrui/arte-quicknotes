@@ -4,23 +4,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.arte.quicknotes.R;
 import com.arte.quicknotes.adapters.NotesAdapter;
+import com.arte.quicknotes.db.NotesDataSource;
 import com.arte.quicknotes.models.Note;
-import com.arte.quicknotes.models.NoteListMock;
 
 public class MainActivity extends AppCompatActivity implements NotesAdapter.Events {
 
     private NotesAdapter mAdapter;
+    private NotesDataSource mNotesDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +36,15 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.Even
     }
 
     private void setupActivity() {
+        final Context context = this;
+
+        mNotesDataSource = NotesDataSource.getInstance(context);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        final Context context = this;
         fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.Even
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.notes_reclycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mAdapter = new NotesAdapter(NoteListMock.getAll(), this);
+        mAdapter = new NotesAdapter(mNotesDataSource.getAll(), this);
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(mAdapter);

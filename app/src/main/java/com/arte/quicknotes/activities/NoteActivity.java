@@ -1,5 +1,6 @@
 package com.arte.quicknotes.activities;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -8,12 +9,14 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.arte.quicknotes.R;
+import com.arte.quicknotes.db.NotesDataSource;
 import com.arte.quicknotes.models.Note;
-import com.arte.quicknotes.models.NoteListMock;
 
 public class NoteActivity extends AppCompatActivity {
 
     public static final String PARAM_NOTE = "param_note";
+
+    private NotesDataSource mNotesDataSource;
 
     private EditText mTitle;
     private EditText mContent;
@@ -54,6 +57,10 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void setupActivity() {
+        Context context = this;
+
+        mNotesDataSource = NotesDataSource.getInstance(context);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -84,16 +91,16 @@ public class NoteActivity extends AppCompatActivity {
         note.setTitle(title);
         note.setContent(content);
         if (mNote == null) {
-            NoteListMock.add(note);
+            mNotesDataSource.add(note);
         } else {
-            NoteListMock.update(note);
+            mNotesDataSource.update(note);
         }
 
         finish();
     }
 
     private void deleteNote() {
-        NoteListMock.delete(mNote);
+        mNotesDataSource.delete(mNote);
         finish();
     }
 }
