@@ -16,8 +16,7 @@ public class NotesDataSource implements NotesStorage {
 
     private static NotesDataSource mInstance;
     private NotesDbHelper dbHelper;
-    private List<Note> notes = new ArrayList<>();
-    private boolean dbDirty = true;
+    private List<Note> mNotes = null;
 
     public static synchronized NotesDataSource getInstance(Context context) {
         if (mInstance == null) {
@@ -36,7 +35,7 @@ public class NotesDataSource implements NotesStorage {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.insert(NotesDbHelper.NoteEntry.TABLE_NAME, null, values);
 
-        dbDirty = true;
+        refreshNotes();
     }
 
     public void update(Note note) {
@@ -47,7 +46,7 @@ public class NotesDataSource implements NotesStorage {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.update(NotesDbHelper.NoteEntry.TABLE_NAME, values, whereClause, args);
 
-        dbDirty = true;
+        refreshNotes();
     }
 
     public void delete(Note note) {
@@ -59,7 +58,7 @@ public class NotesDataSource implements NotesStorage {
                 NotesDbHelper.NoteEntry._ID + " = ?",
                 args);
 
-        dbDirty = true;
+        refreshNotes();
     }
 
     public  Note get(int id) {
@@ -79,9 +78,30 @@ public class NotesDataSource implements NotesStorage {
     }
 
     public  List<Note> getAll() {
-        if (!dbDirty) {
-           return notes;
+        if (mNotes == null) {
+            mNotes = new ArrayList<>();
+            refreshNotes();
         }
+        return mNotes;
+    }
+
+    private ContentValues getContentValues(String title, String content) {
+        ContentValues values = new ContentValues();
+        values.put(NotesDbHelper.NoteEntry.COLUMN_NAME_TITLE, title);
+        values.put(NotesDbHelper.NoteEntry.COLUMN_NAME_CONTENT, content);
+        return values;
+    }
+
+    private Note toNote(Cursor cursor) {
+        Note note = new Note();
+        note.setId(cursor.getInt(cursor.getColumnIndexOrThrow(NotesDbHelper.NoteEntry._ID)));
+        note.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(NotesDbHelper.NoteEntry.COLUMN_NAME_TITLE)));
+        note.setContent(cursor.getString(cursor.getColumnIndexOrThrow(NotesDbHelper.NoteEntry.COLUMN_NAME_CONTENT)));
+        return note;
+    }
+
+
+    private void refreshNotes() {
         String[] projection = {
                 NotesDbHelper.NoteEntry._ID,
                 NotesDbHelper.NoteEntry.COLUMN_NAME_TITLE,
@@ -100,27 +120,10 @@ public class NotesDataSource implements NotesStorage {
                 null,                                   // don't filter by row groups
                 sortOrder                               // The sort order
         );
-        notes.clear();
+        mNotes.clear();
         while(cursor.moveToNext()) {
             Note note = toNote(cursor);
-            notes.add(note);
+            mNotes.add(note);
         }
-        dbDirty = false;
-        return notes;
-    }
-    
-    private ContentValues getContentValues(String title, String content) {
-        ContentValues values = new ContentValues();
-        values.put(NotesDbHelper.NoteEntry.COLUMN_NAME_TITLE, title);
-        values.put(NotesDbHelper.NoteEntry.COLUMN_NAME_CONTENT, content);
-        return values;
-    }
-
-    private Note toNote(Cursor cursor) {
-        Note note = new Note();
-        note.setId(cursor.getInt(cursor.getColumnIndexOrThrow(NotesDbHelper.NoteEntry._ID)));
-        note.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(NotesDbHelper.NoteEntry.COLUMN_NAME_TITLE)));
-        note.setContent(cursor.getString(cursor.getColumnIndexOrThrow(NotesDbHelper.NoteEntry.COLUMN_NAME_CONTENT)));
-        return note;
     }
 }
