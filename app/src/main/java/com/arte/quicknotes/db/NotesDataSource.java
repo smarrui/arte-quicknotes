@@ -17,6 +17,7 @@ public class NotesDataSource implements NotesStorage {
     private static NotesDataSource mInstance;
     private NotesDbHelper dbHelper;
     private List<Note> notes = new ArrayList<>();
+    private boolean dbDirty = true;
 
     public static synchronized NotesDataSource getInstance(Context context) {
         if (mInstance == null) {
@@ -35,7 +36,7 @@ public class NotesDataSource implements NotesStorage {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.insert(NotesDbHelper.NoteEntry.TABLE_NAME, null, values);
 
-        getAll();
+        dbDirty = true;
     }
 
     public void update(Note note) {
@@ -46,7 +47,7 @@ public class NotesDataSource implements NotesStorage {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.update(NotesDbHelper.NoteEntry.TABLE_NAME, values, whereClause, args);
 
-        getAll();
+        dbDirty = true;
     }
 
     public void delete(Note note) {
@@ -58,7 +59,7 @@ public class NotesDataSource implements NotesStorage {
                 NotesDbHelper.NoteEntry._ID + " = ?",
                 args);
 
-        getAll();
+        dbDirty = true;
     }
 
     public  Note get(int id) {
@@ -78,6 +79,9 @@ public class NotesDataSource implements NotesStorage {
     }
 
     public  List<Note> getAll() {
+        if (!dbDirty) {
+           return notes;
+        }
         String[] projection = {
                 NotesDbHelper.NoteEntry._ID,
                 NotesDbHelper.NoteEntry.COLUMN_NAME_TITLE,
@@ -101,6 +105,7 @@ public class NotesDataSource implements NotesStorage {
             Note note = toNote(cursor);
             notes.add(note);
         }
+        dbDirty = false;
         return notes;
     }
     
