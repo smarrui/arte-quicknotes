@@ -16,6 +16,7 @@ public class NotesDataSource implements NotesStorage {
 
     private static NotesDataSource mInstance;
     private NotesDbHelper dbHelper;
+    private List<Note> notes = new ArrayList<>();
 
     public static synchronized NotesDataSource getInstance(Context context) {
         if (mInstance == null) {
@@ -33,6 +34,8 @@ public class NotesDataSource implements NotesStorage {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.insert(NotesDbHelper.NoteEntry.TABLE_NAME, null, values);
+
+        getAll();
     }
 
     public void update(Note note) {
@@ -42,6 +45,8 @@ public class NotesDataSource implements NotesStorage {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.update(NotesDbHelper.NoteEntry.TABLE_NAME, values, whereClause, args);
+
+        getAll();
     }
 
     public void delete(Note note) {
@@ -52,11 +57,8 @@ public class NotesDataSource implements NotesStorage {
         db.delete(NotesDbHelper.NoteEntry.TABLE_NAME,
                 NotesDbHelper.NoteEntry._ID + " = ?",
                 args);
-    }
 
-    public void deleteAllNotes() {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(NotesDbHelper.NoteEntry.TABLE_NAME, null, null);
+        getAll();
     }
 
     public  Note get(int id) {
@@ -94,7 +96,7 @@ public class NotesDataSource implements NotesStorage {
                 null,                                   // don't filter by row groups
                 sortOrder                               // The sort order
         );
-        List<Note> notes = new ArrayList<>();
+        notes.clear();
         while(cursor.moveToNext()) {
             Note note = toNote(cursor);
             notes.add(note);
