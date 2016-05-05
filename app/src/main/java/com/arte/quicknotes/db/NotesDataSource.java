@@ -125,5 +125,6 @@ public class NotesDataSource implements NotesStorage {
             Note note = toNote(cursor);
             mNotes.add(note);
         }
+        cursor.close();
     }
 }
