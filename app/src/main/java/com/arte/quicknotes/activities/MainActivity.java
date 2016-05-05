@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.Even
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mAdapter.notifyDataSetChanged();
         mNotesDataSource.getAll();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
